@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity"
+      prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.2"
+      fx:controller="us.joshkendrick.MediaUtilityBelt.app.PrimaryController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+    <HBox prefHeight="100.0" prefWidth="200.0">
+        <children>
+            <Button fx:id="chooseDirectoryBtn" alignment="CENTER" mnemonicParsing="false"
+                    onAction="#onChooseDirectoryBtnClick" prefWidth="1000.0" text="Choose Folder" HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets right="5.0"/>
+                </HBox.margin>
+            </Button>
+            <TextField fx:id="gPhotosAlbumField" prefWidth="1000.0" promptText="Google Photos Album?"
+                       HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets left="5.0" right="5.0"/>
+                </HBox.margin>
+            </TextField>
+            <Button fx:id="goBtn" mnemonicParsing="false" onAction="#onGoBtnClick" prefWidth="900.0" text="Go"
+                    HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets left="5.0"/>
+                </HBox.margin>
+            </Button>
+        </children>
+    </HBox>
+    <Label fx:id="pathLabel" wrapText="true">
+        <VBox.margin>
+            <Insets top="10.0"/>
+        </VBox.margin>
+    </Label>
+    <Button fx:id="stopBtn" mnemonicParsing="false" onAction="#onStopBtnClick" prefHeight="35.0" prefWidth="Infinity"
+            text="Stop">
+        <VBox.margin>
+            <Insets bottom="10.0" top="10.0"/>
+        </VBox.margin>
+    </Button>
+    <TextArea fx:id="outputBox" prefHeight="1000.0" prefWidth="200.0" wrapText="true" VBox.vgrow="ALWAYS">
+        <font>
+            <Font name="Monospaced Regular" size="14.0"/>
+        </font>
+    </TextArea>
+    <Button fx:id="writeChangesBtn" disable="true" onAction="#onWriteBtnClick" mnemonicParsing="false" prefHeight="35.0"
+            prefWidth="Infinity" text="Write Changes to Files">
+        <VBox.margin>
+            <Insets top="20.0"/>
+        </VBox.margin>
+    </Button>
+</VBox>
