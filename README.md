@@ -1,4 +1,4 @@
-##MediaUtilityBelt
+## MediaUtilityBelt
 
 a tool for correcting media EXIF data, last modified, date created, and chronologically renaming.
 
