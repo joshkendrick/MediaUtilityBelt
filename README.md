@@ -19,3 +19,5 @@ There are 2 configurations you'll need to run in order to debug. Run the debug e
 
 #### Setup:
 Since this targets Java 11 (I used Amazon Coretto 11), to do development you will need to download the javafx sdk and put it on your computer someplace. You may have to update a config or setting to get it to build
+
+If you want to run your own version, you will need to create a project on Google APIs Console, create your own OAuth consent screen with the google-photos-viewonly scope, add your google account as a test user, create an OAuth 2.0 Client ID and replace the client_secrets.json in this project with the one you download. It isn't hard, just not-obvious, but after all that, running it should work.
