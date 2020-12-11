@@ -45,7 +45,7 @@ public class Processor extends Task<List<MediaFile>> {
 
     // try to get date/times from google album
     if (gPhotosAlbumTitle != null && !gPhotosAlbumTitle.trim().isBlank()) {
-      GooglePhotos gPhotos = new GooglePhotos();
+      GooglePhotos gPhotos = GooglePhotos.getInstance();
       printer.addSingleLineText("Attempting to authenticate to Google Photos...");
       if (gPhotos.authenticate()) {
         printer.addSingleLineText("Successful authentication with google");

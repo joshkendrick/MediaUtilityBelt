@@ -28,10 +28,12 @@ import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class GooglePhotos {
 
@@ -40,11 +42,28 @@ public class GooglePhotos {
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static FileDataStoreFactory dataStoreFactory;
   private static HttpTransport httpTransport;
-
+  private static GooglePhotos instance = null;
   private Album album;
   private PhotosLibraryClient plClient;
 
-  private static Credential authorize() throws Exception {
+  private GooglePhotos() {}
+
+  public static GooglePhotos getInstance() {
+    if (instance == null) {
+      instance = new GooglePhotos();
+    }
+
+    return instance;
+  }
+
+  private static Credential authorize() throws GeneralSecurityException, IOException {
+    if (httpTransport == null) {
+      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+    }
+    if (dataStoreFactory == null) {
+      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
+    }
+
     // load client secrets
     GoogleClientSecrets clientSecrets =
         GoogleClientSecrets.load(
@@ -134,32 +153,56 @@ public class GooglePhotos {
 
   public boolean authenticate() {
     try {
-      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-      // authorization
       Credential credential = authorize();
-      if (credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() < 0) {
-        credential.refreshToken();
+      // if there wasn't a credential, close up everything
+      if (credential == null) {
+        close();
+        return false;
       }
 
-      // Set up the Photos Library Client that interacts with the API
-      OAuth2Credentials credentials =
-          OAuth2Credentials.create(
-              new AccessToken(
-                  credential.getAccessToken(),
-                  new Date(credential.getExpirationTimeMilliseconds())));
-      PhotosLibrarySettings settings =
-          PhotosLibrarySettings.newBuilder()
-              .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-              .build();
-
-      plClient = PhotosLibraryClient.initialize(settings);
+      // if we've got a credential, but it's stale, re-build the client
+      if (credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() < 0) {
+        credential.refreshToken();
+        close();
+        build(credential);
+      }
+      // we have a valid credential, if the client is null, build it
+      else if (plClient == null || plClient.isShutdown() || plClient.isTerminated()) {
+        build(credential);
+      }
+      return true;
     } catch (IOException e) {
       System.err.println(e.getMessage());
     } catch (Throwable t) {
       t.printStackTrace();
     }
 
-    return true;
+    return false;
+  }
+
+  private void close() throws InterruptedException, IOException {
+    if (plClient != null) {
+      plClient.shutdownNow();
+      plClient.awaitTermination(15, TimeUnit.SECONDS);
+      plClient.close();
+    }
+
+    if (httpTransport != null) {
+      httpTransport.shutdown();
+    }
+  }
+
+  private void build(Credential credential) throws IOException {
+    // Set up the Photos Library Client that interacts with the API
+    OAuth2Credentials credentials =
+        OAuth2Credentials.create(
+            new AccessToken(
+                credential.getAccessToken(), new Date(credential.getExpirationTimeMilliseconds())));
+    PhotosLibrarySettings settings =
+        PhotosLibrarySettings.newBuilder()
+            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
+            .build();
+
+    plClient = PhotosLibraryClient.initialize(settings);
   }
 }
