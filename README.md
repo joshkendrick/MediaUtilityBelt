@@ -1,4 +1,5 @@
-##MediaUtilityBelt
+
+## MediaUtilityBelt
 a tool for correcting media EXIF data, last modified, date created, and chronologically renaming.
 
 Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releases) if you just want to use it, but a few things you should know:
