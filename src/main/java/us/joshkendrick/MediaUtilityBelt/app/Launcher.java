@@ -17,7 +17,8 @@ public class Launcher extends Application {
   @Override
   public void start(Stage stage) throws IOException {
     // which layout to load, path is relative to this class
-    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/primary.fxml"));
+    FXMLLoader loader =
+        new FXMLLoader(getClass().getClassLoader().getResource("fxml/primary.fxml"));
     Parent root = loader.load();
 
     stage.setTitle("MediaUtilityBelt");
