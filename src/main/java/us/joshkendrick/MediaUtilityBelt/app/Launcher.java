@@ -20,7 +20,7 @@ public class Launcher extends Application {
     FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/primary.fxml"));
     Parent root = loader.load();
 
-    stage.setTitle("MediaUtilityBelt v0.0.1");
+    stage.setTitle("MediaUtilityBelt");
     stage.setScene(new Scene(root, 1050, 480));
     stage.show();
 

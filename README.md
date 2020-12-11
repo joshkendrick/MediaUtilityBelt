@@ -1,5 +1,4 @@
 ##MediaUtilityBelt
-
 a tool for correcting media EXIF data, last modified, date created, and chronologically renaming.
 
 Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releases) if you just want to use it, but a few things you should know:
@@ -11,3 +10,11 @@ Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releas
     2. Then you can click `Write Changes` to make those changes.
 - If you provide a Google Photos album name, it will attempt to find that album in your Google Photos and get the date/time by matching filenames.
 - It will try to read a date/time from the filename, the pattern is yyyy-MM-dd_HHmmss
+
+### Development:
+Everything necessary to compile/build/deploy should be included in the pom. You should be able to import this as a maven project into IntelliJ.
+
+There are 2 configurations you'll need to run in order to debug. Run the debug execution in the pom, then run a RemoteJVM Debugger config to debug it.
+
+#### Setup:
+Since this targets Java 11 (I used Amazon Coretto 11), to do development you will need to download the javafx sdk and put it on your computer someplace. You may have to update a config or setting to get it to build
