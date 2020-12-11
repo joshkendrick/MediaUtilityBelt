@@ -1,4 +1,3 @@
-
 ## MediaUtilityBelt
 a tool for correcting media EXIF data, last modified, date created, and chronologically renaming.
 
@@ -11,6 +10,8 @@ Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releas
     2. Then you can click `Write Changes` to make those changes.
 - If you provide a Google Photos album name, it will attempt to find that album in your Google Photos and get the date/time by matching filenames.
 - It will try to read a date/time from the filename, the pattern is yyyy-MM-dd_HHmmss
+
+#### The privacy policy only exists here in order to get verified by Google. I don't retain any data, this app just pulls the media from your album, sees if the filenames match, and grabs the date/time from those photos/videos. Everything else is discarded after the call.
 
 ### Development:
 Everything necessary to compile/build/deploy should be included in the pom. You should be able to import this as a maven project into IntelliJ.
