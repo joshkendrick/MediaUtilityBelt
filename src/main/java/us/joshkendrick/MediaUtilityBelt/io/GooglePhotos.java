@@ -56,6 +56,7 @@ public class GooglePhotos {
     return instance;
   }
 
+  // Since the app is in "Testing" in Google, the refresh token is only good for 7 days
   private static Credential authorize() throws GeneralSecurityException, IOException {
     if (httpTransport == null) {
       httpTransport = GoogleNetHttpTransport.newTrustedTransport();

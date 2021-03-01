@@ -23,4 +23,6 @@ Since this targets Java 11 (I used Amazon Coretto 11), to do development you wil
 
 If you want to run your own version, you will need to create a project on Google APIs Console, create your own OAuth consent screen with the google-photos-viewonly scope, add your google account as a test user, create an OAuth 2.0 Client ID and replace the client_secrets.json in this project with the one you download. It isn't hard, just not-obvious, but after all that, running it should work.
 
+I tried to get it published, couldn't get all the steps right. Tried to convert to internal, but then I can't use my gmail account to access the photos. Because the app is in "Testing" the refresh token expires after 7 days.
+
 [Privacy Policy](privacy-policy.html)
