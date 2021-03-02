@@ -20,6 +20,9 @@ Everything necessary to compile/build/deploy should be included in the pom. You 
 
 There are 2 configurations you'll need to run in order to debug. Run the debug execution in the pom, then run a RemoteJVM Debugger config to debug it.
 
+#### Publishing:
+Note that when trying to publish, the built jar will appear in a "shade/" subdirectory - NOT under "target/" directory
+
 #### Setup:
 Since this targets Java 11 (I used Amazon Coretto 11), to do development you will need to download the javafx sdk and put it on your computer someplace. You may have to update a config or setting to get it to build
 
