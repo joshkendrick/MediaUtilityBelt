@@ -9,7 +9,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.OAuth2Credentials;
@@ -25,7 +24,6 @@ import us.joshkendrick.MediaUtilityBelt.app.PrimaryController;
 import us.joshkendrick.MediaUtilityBelt.app.Printer;
 import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
@@ -37,11 +35,10 @@ import java.util.concurrent.TimeUnit;
 
 public class GooglePhotos {
 
-  private static final File DATA_STORE_DIR =
-      new File(System.getProperty("user.home"), ".store/mediaUtilityBelt");
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private static FileDataStoreFactory dataStoreFactory;
   private static HttpTransport httpTransport;
+  private static GoogleClientSecrets clientSecrets;
+  private static Credential credential;
   private static GooglePhotos instance = null;
   private Album album;
   private PhotosLibraryClient plClient;
@@ -57,33 +54,42 @@ public class GooglePhotos {
   }
 
   // Since the app is in "Testing" in Google, the refresh token is only good for 7 days
-  private static Credential authorize() throws GeneralSecurityException, IOException {
-    if (httpTransport == null) {
-      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    }
-    if (dataStoreFactory == null) {
-      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
+  private boolean authorize() throws GeneralSecurityException, IOException, InterruptedException {
+    // if there's no credential, or it's expired, try to create a new one
+    if (credential == null
+        || credential.getExpiresInSeconds() == null
+        || credential.getExpiresInSeconds() <= 0) {
+      // if it's expired, close existing client and httpTransport
+      close();
+
+      if (httpTransport == null) {
+        httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+      }
+
+      // load client secrets
+      if (clientSecrets == null) {
+        clientSecrets =
+            GoogleClientSecrets.load(
+                JSON_FACTORY,
+                new InputStreamReader(
+                    PrimaryController.class.getResourceAsStream("/client_secrets.json")));
+      }
+      // set up authorization code flow
+      GoogleAuthorizationCodeFlow.Builder flowBuilder =
+          new GoogleAuthorizationCodeFlow.Builder(
+                  httpTransport,
+                  JSON_FACTORY,
+                  clientSecrets,
+                  Collections.singleton("https://www.googleapis.com/auth/photoslibrary.readonly"))
+              .setAccessType("online")
+              .setApprovalPrompt("auto");
+      // authorize
+      credential =
+          new AuthorizationCodeInstalledApp(flowBuilder.build(), new LocalServerReceiver())
+              .authorize("user");
     }
 
-    // load client secrets
-    GoogleClientSecrets clientSecrets =
-        GoogleClientSecrets.load(
-            JSON_FACTORY,
-            new InputStreamReader(
-                PrimaryController.class.getResourceAsStream("/client_secrets.json")));
-    // set up authorization code flow
-    GoogleAuthorizationCodeFlow flow =
-        new GoogleAuthorizationCodeFlow.Builder(
-                httpTransport,
-                JSON_FACTORY,
-                clientSecrets,
-                Collections.singleton("https://www.googleapis.com/auth/photoslibrary.readonly"))
-            .setDataStoreFactory(dataStoreFactory)
-            .setAccessType("offline")
-            .setApprovalPrompt("auto")
-            .build();
-    // authorize
-    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+    return (credential != null && credential.getExpiresInSeconds() > 0);
   }
 
   public boolean findAlbum(String albumName) {
@@ -154,18 +160,10 @@ public class GooglePhotos {
 
   public boolean authenticate() {
     try {
-      Credential credential = authorize();
       // if there wasn't a credential, close up everything
-      if (credential == null) {
+      if (!authorize()) {
         close();
         return false;
-      }
-
-      // if we've got a credential, but it's stale, re-build the client
-      if (credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() < 0) {
-        credential.refreshToken();
-        close();
-        build(credential);
       }
       // we have a valid credential, if the client is null, build it
       else if (plClient == null || plClient.isShutdown() || plClient.isTerminated()) {

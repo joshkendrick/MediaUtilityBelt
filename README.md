@@ -13,6 +13,8 @@ Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releas
 
 #### The privacy policy only exists here in order to get verified by Google. I don't retain any data, this app just pulls the media from your album, sees if the filenames match, and grabs the date/time from those photos/videos. Everything else is discarded after the call.
 
+[Privacy Policy](privacy-policy.html)
+
 ### Development:
 Everything necessary to compile/build/deploy should be included in the pom. You should be able to import this as a maven project into IntelliJ.
 
@@ -23,6 +25,16 @@ Since this targets Java 11 (I used Amazon Coretto 11), to do development you wil
 
 If you want to run your own version, you will need to create a project on Google APIs Console, create your own OAuth consent screen with the google-photos-viewonly scope, add your google account as a test user, create an OAuth 2.0 Client ID and replace the client_secrets.json in this project with the one you download. It isn't hard, just not-obvious, but after all that, running it should work.
 
-I tried to get it published, couldn't get all the steps right. Tried to convert to internal, but then I can't use my gmail account to access the photos. Because the app is in "Testing" the refresh token expires after 7 days.
+### Google APIs
+I tried a few different ways of getting this published. In the end, I decided it just wasn't worth the trouble for a freebie app where I'm probably the only person who will ever use it:
 
-[Privacy Policy](privacy-policy.html)
+1. I started with an "External" in "Testing" as a POC.
+2. To get rid of all the warning screens on consent, you have to get "Approved" which involves a whole bunch of things, web pages, privacy policies, videos, terms of service
+3. Google suggested just being an "Internal" app
+    - I created an org, moved the app, etc.
+    - However, could not figure out how to add my personal Gmail (where all my photos/videos are) to the organization. So also didnt solve the problem
+4. At this point, decide just keep it an "External" app in "Testing" since no one will ever use it anyway
+
+After using it for a few months, I noticed every time I tried to re-use it after a long amount of time, the token refresh wasn't working. I worked on it for a while, found a note that says an app is in "Testing", the refresh token expires after 7 days. So storing the refresh token, the "offline" mode wasn't really going to work anyway.
+
+Final solution, it runs "online" in "auto". You'll have to re-consent each time you start the app, but whatever.
