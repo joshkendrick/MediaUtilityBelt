@@ -3,6 +3,8 @@ a tool for correcting media EXIF data, last modified, date created, and chronolo
 
 Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releases) if you just want to use it, but a few things you should know:
 
+**Amazon Coretto 11 is required to run this**
+
 - `MediaUtilityBelt` works in 2 steps:
     1. It goes through a directory and finds media files. It gets information on those files and determines date/times and order. It tells you if it found anything it couldn't figure out. Review the output for correctness:
         - if the `newDateTime` column is populated, it will try to write a new date/time for lastModified, dateCreated, and EXIF if it's a jpeg.
@@ -10,10 +12,6 @@ Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releas
     2. Then you can click `Write Changes` to make those changes.
 - If you provide a Google Photos album name, it will attempt to find that album in your Google Photos and get the date/time by matching filenames.
 - It will try to read a date/time from the filename, the pattern is yyyy-MM-dd_HHmmss
-
-#### The privacy policy only exists here in order to get verified by Google. I don't retain any data, this app just pulls the media from your album, sees if the filenames match, and grabs the date/time from those photos/videos. Everything else is discarded after the call.
-
-[Privacy Policy](privacy-policy.html)
 
 ### Development:
 Everything necessary to compile/build/deploy should be included in the pom. You should be able to import this as a maven project into IntelliJ.
