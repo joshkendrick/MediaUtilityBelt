@@ -139,7 +139,7 @@ public class GooglePhotos {
                 Timestamp ts = gItem.getMediaMetadata().getCreationTime();
                 Instant i = Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
                 ZonedDateTime zdt = i.atZone(ZoneId.systemDefault());
-                mapping.put(gItem.getFilename(), zdt);
+                mapping.put(gItem.getFilename().toLowerCase(), zdt);
               });
 
       if (response.getNextPageToken().isEmpty()) {
@@ -152,9 +152,7 @@ public class GooglePhotos {
     } while (request.isPresent());
 
     for (MediaFile mediaFile : files) {
-      if (mapping.containsKey(mediaFile.getFilename())) {
-        mediaFile.setGPhotosDateTime(mapping.get(mediaFile.getFilename()));
-      }
+        mediaFile.setGPhotosDateTime(mapping.get(mediaFile.getFilename().toLowerCase()));
     }
   }
 
