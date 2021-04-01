@@ -138,7 +138,8 @@ public class Processor extends Task<List<MediaFile>> {
                   || path.endsWith(".png")
                   || path.endsWith(".bmp")
                   || path.endsWith(".mp4")
-                  || path.endsWith(".mov");
+                  || path.endsWith(".mov")
+                  || path.endsWith(".heic");
             });
     if (files == null || files.length < 1) {
       printer.addDoubleLineText("NO FILES FOUND IN " + parentDir.getPath());
