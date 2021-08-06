@@ -139,6 +139,13 @@ public class GooglePhotos {
                 Timestamp ts = gItem.getMediaMetadata().getCreationTime();
                 Instant i = Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
                 ZonedDateTime zdt = i.atZone(ZoneId.systemDefault());
+                /*
+                 * if there are files with the same name in the google photos album
+                 * Ex: IMG_1128.jpg x2 in google, but IMG_1128.jpg and IMG_1128(1).jpg locally
+                 * then the first date/time will be overwritten by the second
+                 * I believe the best way to handle this is figure out the dupes, pull the dupes into
+                 * a second album on google photos and locally and run those files separately
+                 */
                 mapping.put(gItem.getFilename().toLowerCase(), zdt);
               });
 
