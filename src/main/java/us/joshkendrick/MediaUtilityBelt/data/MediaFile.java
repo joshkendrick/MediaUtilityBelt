@@ -10,6 +10,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -17,7 +18,7 @@ public class MediaFile implements Comparable<MediaFile> {
 
   private static final DateTimeFormatter filenameFormat =
       DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss_");
-  private final boolean isJpeg;
+  private final boolean isSupported;
   private File file;
   private ZonedDateTime currentDateTime;
 
@@ -31,7 +32,8 @@ public class MediaFile implements Comparable<MediaFile> {
 
   public MediaFile(File file) {
     this.file = file;
-    this.isJpeg = getFilename().endsWith(".jpeg") | getFilename().endsWith(".jpg");
+    String filename = getFilename().toLowerCase();
+    this.isSupported = List.of(".jpeg", ".jpg", ".heic").stream().anyMatch(filename::endsWith);
 
     try {
       BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -76,8 +78,8 @@ public class MediaFile implements Comparable<MediaFile> {
     this.filenameDateTime = filenameDateTime;
   }
 
-  public boolean isJpeg() {
-    return isJpeg;
+  public boolean isSupported() {
+    return isSupported;
   }
 
   public boolean hasChanges() {

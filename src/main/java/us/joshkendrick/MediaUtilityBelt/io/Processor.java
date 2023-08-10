@@ -65,7 +65,7 @@ public class Processor extends Task<List<MediaFile>> {
     // try to get date/times from EXIF for jpegs
     ExifMetadataHelper exifHelper = new ExifMetadataHelper();
     items.stream()
-        .filter(MediaFile::isJpeg)
+        .filter(MediaFile::isSupported)
         .forEach(
             mediaFile -> {
               try {

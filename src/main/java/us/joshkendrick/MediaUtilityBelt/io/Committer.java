@@ -52,7 +52,7 @@ public class Committer extends Task<Integer> {
                 errors.getAndIncrement();
               }
             })
-        .filter(MediaFile::isJpeg)
+        .filter(MediaFile::isSupported)
         .forEach(
             mediaFile -> {
               try {

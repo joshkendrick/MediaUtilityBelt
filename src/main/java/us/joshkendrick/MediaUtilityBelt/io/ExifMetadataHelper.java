@@ -83,7 +83,7 @@ public class ExifMetadataHelper {
     }
 
     // if file does not contain any exif metadata, we create an empty
-    // set of exif metadata. Otherwise, we keep all of the other
+    // set of exif metadata. Otherwise, we keep all the other
     // existing tags.
     if (null == outputSet) {
       outputSet = new TiffOutputSet();
