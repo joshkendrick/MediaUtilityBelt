@@ -35,8 +35,7 @@ public class ExifMetadataHelper {
       throws IOException, ImageReadException, ParseException {
     ImageMetadata metadata = Imaging.getMetadata(file);
     ZonedDateTime exifDateTime = null;
-    if (metadata instanceof JpegImageMetadata) {
-      JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+    if (metadata instanceof JpegImageMetadata jpegMetadata) {
       TiffField dateTimeValue =
           jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 

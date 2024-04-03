@@ -39,7 +39,7 @@ public class Processor extends Task<List<MediaFile>> {
     printer.addText("SCANNING...");
 
     List<MediaFile> items = findMediaFiles(rootDir);
-    if (items == null || items.size() < 1) {
+    if (items == null || items.isEmpty()) {
       return items;
     }
 

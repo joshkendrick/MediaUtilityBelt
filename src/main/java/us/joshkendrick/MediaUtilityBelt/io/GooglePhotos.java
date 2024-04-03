@@ -20,6 +20,7 @@ import com.google.photos.library.v1.proto.SearchMediaItemsRequest;
 import com.google.photos.library.v1.proto.SearchMediaItemsResponse;
 import com.google.photos.types.proto.Album;
 import com.google.protobuf.Timestamp;
+import org.apache.commons.codec.binary.StringUtils;
 import us.joshkendrick.MediaUtilityBelt.app.PrimaryController;
 import us.joshkendrick.MediaUtilityBelt.app.Printer;
 import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
@@ -72,7 +73,8 @@ public class GooglePhotos {
             GoogleClientSecrets.load(
                 JSON_FACTORY,
                 new InputStreamReader(
-                    PrimaryController.class.getResourceAsStream("/client_secrets.json")));
+                    Objects.requireNonNull(
+                        PrimaryController.class.getResourceAsStream("/client_secrets.json"))));
       }
       // set up authorization code flow
       GoogleAuthorizationCodeFlow.Builder flowBuilder =
@@ -146,7 +148,12 @@ public class GooglePhotos {
                  * I believe the best way to handle this is figure out the dupes, pull the dupes into
                  * a second album on google photos and locally and run those files separately
                  */
-                mapping.put(gItem.getFilename().toLowerCase(), zdt);
+                var key =
+                    gItem
+                        .getFilename()
+                        .toLowerCase()
+                        .substring(0, gItem.getFilename().indexOf("."));
+                mapping.put(key, zdt);
               });
 
       if (response.getNextPageToken().isEmpty()) {
@@ -159,7 +166,13 @@ public class GooglePhotos {
     } while (request.isPresent());
 
     for (MediaFile mediaFile : files) {
-        mediaFile.setGPhotosDateTime(mapping.get(mediaFile.getFilename().toLowerCase()));
+      var key =
+          mediaFile.getFilename().toLowerCase().substring(0, mediaFile.getFilename().indexOf("."));
+      if (mapping.containsKey(key)) {
+        mediaFile.setGPhotosDateTime(mapping.get(key));
+      } else {
+        printer.addSingleLineText("!!! Google Photos map does not contain key: " + key);
+      }
     }
   }
 
