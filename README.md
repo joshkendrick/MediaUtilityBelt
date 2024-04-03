@@ -3,8 +3,6 @@ a tool for correcting media EXIF data, last modified, date created, and chronolo
 
 Check out the [releases](https://github.com/joshkendrick/MediaUtilityBelt/releases) if you just want to use it, but a few things you should know:
 
-**Amazon Coretto 11 is required to run this**
-
 - `MediaUtilityBelt` works in 2 steps:
     1. It goes through a directory and finds media files. It gets information on those files and determines date/times and order. It tells you if it found anything it couldn't figure out. Review the output for correctness:
         - if the `newDateTime` column is populated, it will try to write a new date/time for lastModified, dateCreated, and EXIF if it's a jpeg.
@@ -19,10 +17,15 @@ Everything necessary to compile/build/deploy should be included in the pom. You 
 There are 2 configurations you'll need to run in order to debug. Run the debug execution in the pom, then run a RemoteJVM Debugger config to debug it.
 
 #### Publishing:
-Note that when trying to publish, the built jar will appear in a "shade/" subdirectory - NOT under "target/" directory
+`mvn clean compile package`
+
+Note that when trying to publish, the built jar will appear in a "shade/" subdirectory - NOT under "target/" directory 
+
+Once the jar is built, you should be able to use it by double-clicking the jar (if you have Java set up correctly on your machine)
+- make sure to test the program outside IntelliJ. If issues are encountered, you can start the program through shell with java -jar <filename>.jar and any stack trace will print to the console
 
 #### Setup:
-Since this targets Java 11 (I used Amazon Coretto 11), to do development you will need to download the javafx sdk and put it on your computer someplace. You may have to update a config or setting to get it to build
+Since this targets Java 17, to do development you will need to download the javafx sdk and put it on your computer someplace. You may have to update a config or setting to get it to build
 
 If you want to run your own version, you will need to create a project on Google APIs Console, create your own OAuth consent screen with the google-photos-viewonly scope, add your google account as a test user, create an OAuth 2.0 Client ID and replace the client_secrets.json in this project with the one you download. It isn't hard, just not-obvious, but after all that, running it should work.
 
