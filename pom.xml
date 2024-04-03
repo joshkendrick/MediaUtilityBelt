@@ -127,6 +127,10 @@
                                         <Build-Number>${project.version}</Build-Number>
                                     </manifestEntries>
                                 </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/services</resource>
+                                    <file>io.grpc.LoadBalancerProvider</file>
+                                </transformer>
                             </transformers>
                         </configuration>
                     </execution>
