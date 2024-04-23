@@ -1,8 +1,6 @@
 package us.joshkendrick.MediaUtilityBelt.io;
 
 import javafx.concurrent.Task;
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.ImageWriteException;
 import us.joshkendrick.MediaUtilityBelt.app.Printer;
 import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
 
@@ -52,7 +50,7 @@ public class Committer extends Task<Integer> {
                 errors.getAndIncrement();
               }
             })
-        .filter(MediaFile::isSupported)
+        .filter(MediaFile::isExif)
         .forEach(
             mediaFile -> {
               try {
@@ -63,7 +61,7 @@ public class Committer extends Task<Integer> {
                   printer.addSingleLineText("ERROR writing new EXIF to " + mediaFile.getFilename());
                   errors.getAndIncrement();
                 }
-              } catch (IOException | ImageReadException | ImageWriteException e) {
+              } catch (IOException e) {
                 printer.addSingleLineText(
                     "ERROR writing new EXIF date/time to " + mediaFile.getFilename());
                 e.printStackTrace();

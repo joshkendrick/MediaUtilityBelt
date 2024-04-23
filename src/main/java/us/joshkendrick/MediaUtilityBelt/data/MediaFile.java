@@ -17,7 +17,7 @@ public class MediaFile implements Comparable<MediaFile> {
 
   private static final DateTimeFormatter filenameFormat =
       DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss_");
-  private final boolean isSupported;
+  private final boolean isExif;
   private File file;
   private ZonedDateTime currentDateTime;
 
@@ -32,7 +32,7 @@ public class MediaFile implements Comparable<MediaFile> {
   public MediaFile(File file) {
     this.file = file;
     String filename = getFilename().toLowerCase();
-    this.isSupported = Stream.of(".jpeg", ".jpg", ".heic").anyMatch(filename::endsWith);
+    this.isExif = Stream.of(".jpeg", ".jpg", ".heic").anyMatch(filename::endsWith);
 
     try {
       BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -77,8 +77,8 @@ public class MediaFile implements Comparable<MediaFile> {
     this.filenameDateTime = filenameDateTime;
   }
 
-  public boolean isSupported() {
-    return isSupported;
+  public boolean isExif() {
+    return isExif;
   }
 
   public boolean hasChanges() {

@@ -28,9 +28,7 @@ import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -140,7 +138,7 @@ public class GooglePhotos {
               gItem -> {
                 Timestamp ts = gItem.getMediaMetadata().getCreationTime();
                 Instant i = Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
-                ZonedDateTime zdt = i.atZone(ZoneId.systemDefault());
+                ZonedDateTime zdt = i.atZone(ZoneOffset.UTC);
                 /*
                  * if there are files with the same name in the google photos album
                  * Ex: IMG_1128.jpg x2 in google, but IMG_1128.jpg and IMG_1128(1).jpg locally

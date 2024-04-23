@@ -1,7 +1,6 @@
 package us.joshkendrick.MediaUtilityBelt.io;
 
 import javafx.concurrent.Task;
-import org.apache.commons.imaging.ImageReadException;
 import us.joshkendrick.MediaUtilityBelt.app.Printer;
 import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
 
@@ -65,12 +64,12 @@ public class Processor extends Task<List<MediaFile>> {
     // try to get date/times from EXIF for jpegs
     ExifMetadataHelper exifHelper = new ExifMetadataHelper();
     items.stream()
-        .filter(MediaFile::isSupported)
+        .filter(MediaFile::isExif)
         .forEach(
             mediaFile -> {
               try {
                 mediaFile.setEXIFDateTime(exifHelper.getEXIFDateTime(mediaFile.getFile()));
-              } catch (IOException | ImageReadException | ParseException e) {
+              } catch (IOException | ParseException e) {
                 printer.addSingleLineText(
                     "ERROR: could not parse EXIF for " + mediaFile.getFilename());
                 e.printStackTrace();

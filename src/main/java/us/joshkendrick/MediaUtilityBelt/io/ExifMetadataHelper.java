@@ -1,7 +1,7 @@
 package us.joshkendrick.MediaUtilityBelt.io;
 
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.ImageWriteException;
+import com.google.protobuf.FieldType;
+import com.sun.scenario.effect.Offset;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
@@ -9,6 +9,9 @@ import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.TiffDirectoryType;
+import org.apache.commons.imaging.formats.tiff.fieldtypes.AbstractFieldType;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoAscii;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import us.joshkendrick.MediaUtilityBelt.data.MediaFile;
@@ -19,44 +22,58 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ExifMetadataHelper {
 
   // EXIF Date/Time format
-  private static final SimpleDateFormat readFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-
   private static final DateTimeFormatter writeFormatter =
       DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
+  private static final TagInfoAscii OFFSET_TIME = new TagInfoAscii("OffsetTime", 36880, 7,TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+  private static final TagInfoAscii OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 36881, 7,TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+  private static final TagInfoAscii OFFSET_TIME_DIGITIZED = new TagInfoAscii("OffsetTimeDigitized", 36882, 7,TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+
   public ZonedDateTime getEXIFDateTime(File file)
-      throws IOException, ImageReadException, ParseException {
+      throws IOException, ParseException {
     ImageMetadata metadata = Imaging.getMetadata(file);
     ZonedDateTime exifDateTime = null;
     if (metadata instanceof JpegImageMetadata jpegMetadata) {
       TiffField dateTimeValue =
-          jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+          jpegMetadata.findExifValue(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
       if (dateTimeValue == null) {
-        dateTimeValue = jpegMetadata.findEXIFValue(ExifTagConstants.EXIF_TAG_DATE_TIME_DIGITIZED);
+        dateTimeValue = jpegMetadata.findExifValue(ExifTagConstants.EXIF_TAG_DATE_TIME_DIGITIZED);
+      }
+
+      // get the first timezone field that can be parsed
+      TiffField timezoneOffset =
+              jpegMetadata.findExifValue(OFFSET_TIME);
+      if (!(timezoneOffset.getValue() instanceof String)) {
+        timezoneOffset = jpegMetadata.findExifValue(OFFSET_TIME_ORIGINAL);
+        if (!(timezoneOffset.getValue() instanceof String)) {
+          timezoneOffset = jpegMetadata.findExifValue(OFFSET_TIME_DIGITIZED);
+        }
+      }
+      var timezone = ZoneId.systemDefault();
+      if (timezoneOffset.getValue() instanceof String timezoneOffsetStr) {
+        timezone = ZoneOffset.of(timezoneOffsetStr).normalized();
       }
 
       if (dateTimeValue != null) {
-        exifDateTime =
-            readFormatter
-                .parse(dateTimeValue.getStringValue())
-                .toInstant()
-                .atZone(ZoneId.systemDefault());
+        var dateTimeNoZone = LocalDateTime.parse(dateTimeValue.getStringValue(), writeFormatter);
+        exifDateTime = ZonedDateTime.of(dateTimeNoZone, timezone);
       }
     }
     return exifDateTime;
   }
 
   public boolean writeEXIFDateTime(MediaFile mediaFile)
-      throws IOException, ImageReadException, ImageWriteException {
-
+      throws IOException {
     File jpeg = mediaFile.getFile();
 
     TiffOutputSet outputSet = null;
@@ -100,7 +117,7 @@ public class ExifMetadataHelper {
   }
 
   private boolean saveExifToJpeg(File jpegFile, TiffOutputSet exif)
-      throws IOException, ImageWriteException, ImageReadException {
+      throws IOException {
     String tempFileName = jpegFile.getAbsolutePath() + ".tmp";
     File tempFile = new File(tempFileName);
 
